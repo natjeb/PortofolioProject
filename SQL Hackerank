@@ -1,0 +1,177 @@
+-- SQL Hackerrank Exercises
+CASE 1 – BINARY SEARCH TREE (BST)
+You are given a table, BST, containing two columns: N and P, where N represents the value of a node in Binary Tree, and P is the parent of N.
+ 
+Write a query to find the node type of Binary Tree ordered by the value of the node. Output one of the following for each node:
+
+Root: If node is root node.
+Leaf: If node is leaf node.
+Inner: If node is neither root nor leaf node.
+
+Sample Input
+ 
+Sample Output
+1 Leaf
+2 Inner
+3 Leaf
+5 Root
+6 Leaf
+8 Inner
+9 Leaf
+
+Explanation
+The Binary Tree below illustrates the sample:
+ 
+ANSWER
+WITH NodeTypes AS (
+    SELECT DISTINCT
+        N,
+        CASE
+            WHEN P IS NULL THEN 'Root'
+            WHEN N IN (SELECT P FROM BST WHERE P IS NOT NULL) THEN 'Inner'
+            ELSE 'Leaf'
+        END AS NodeType
+    FROM BST
+)
+SELECT
+    N,
+    NodeType
+FROM NodeTypes
+ORDER BY N;
+
+CASE 2 – NEW COMPANIES
+•	Company: The company_code is the code of the company and founder is the founder of the company.
+ 
+•	Lead_Manager: The lead_manager_code is the code of the lead manager, and the company_code is the code of the
+ 
+•	Senior_Manager: The senior_manager_code is the code of the senior manager, the lead_manager_code is the code of its lead manager, and the company_code is the code of the working company.
+ 
+•	Manager: The manager_code is the code of the manager, the senior_manager_code is the code of its senior manager, the lead_manager_code is the code of its lead manager, and the company_code is the code of the working company.
+ 
+•	Employee: The employee_code is the code of the employee, the manager_code is the code of its manager, the senior_manager_code is the code of its senior manager, the lead_manager_code is the code of its lead manager, and
+
+Sample Input
+ 
+Company Table:
+   
+Lead_Manager Table:
+   
+Senior_Manager Table:   
+Manager Table:   
+Employee Table:  
+Sample Output
+C1 Monika 1 2 1 2
+C2 Samantha 1 1 2 2
+
+ANSWER
+SELECT
+    c.company_code,
+    c.founder,
+    COUNT(DISTINCT lm.lead_manager_code),
+    COUNT(DISTINCT sm.senior_manager_code),
+    COUNT(DISTINCT m.manager_code),
+    COUNT(DISTINCT e.employee_code)
+    
+FROM
+    Company c 
+        LEFT JOIN 
+    Lead_Manager lm ON c.company_code = lm.company_code
+        LEFT JOIN
+    Senior_Manager sm ON lm.lead_manager_code = sm.lead_manager_code 
+        LEFT JOIN
+    Manager m ON sm.senior_manager_code = m.senior_manager_code
+        LEFT JOIN
+    Employee e ON m.manager_code = e.manager_code
+
+GROUP BY
+    c.company_code,
+    c.founder
+
+ORDER BY
+    c.company_code
+
+CASE 3 – Revising Aggregation – The Count Function
+Query a count of the number of cities in CITY having a Population larger than 100,000.
+Input Format
+The CITY table is described as follows:
+  
+Answer
+SELECT
+    COUNT(Name)
+FROM
+    City
+WHERE
+    Population > 100000
+
+
+CASE 4 – Revising Aggregation – The Count Function
+Query the total population of all cities in CITY where District is California.
+Answer
+SELECT
+    SUM(Population)
+FROM
+    City
+WHERE
+    District = "California"
+
+CASE 5 – Revising Aggregation – Averages
+Query the average population of all cities in CITY where District is California.
+Answer
+SELECT
+    AVG(Population)
+FROM
+    City
+WHERE
+    District =  "California"
+
+CASE 6 – Revising Aggregation – Averages
+Query the average population for all cities in CITY, rounded down to the nearest integer.
+Answer
+SELECT
+    FLOOR(AVG(Population))
+FROM
+    City
+CASE 7 – Japan Population
+Query the sum of the populations for all Japanese cities in CITY. The COUNTRYCODE for Japan is JPN.
+Answer
+SELECT
+    SUM(Population)
+FROM
+    City
+WHERE
+    Countrycode = "JPN"
+
+CASE 8 – Population Density Difference
+Query the difference between the maximum and minimum populations in CITY.
+Answer
+SELECT
+    MAX(Population) - MIN(Population)
+FROM
+    City
+
+CASE 9 – The Blunder
+Samantha was tasked with calculating the average monthly salaries for all employees in the EMPLOYEES table, but did not realize her keyboard's  key was broken until after completing the calculation. She wants your help finding the difference between her miscalculation (using salaries with any zeros removed), and the actual average salary.
+Input Format
+The EMPLOYEES table is described as follows:
+ 
+Note: Salary is per month.
+Constraints
+.
+Sample Input
+ 
+Sample Output
+2061
+Explanation
+The table below shows the salaries without zeros as they were entered by Samantha:
+ 
+Samantha computes an average salary of . The actual average salary is .
+The resulting error between the two calculations is . Since it is equal to the integer , it does not get rounded up.
+
+Write a query calculating the amount of error (i.e.:  average monthly salaries), and round it up to the next integer.
+Answer
+SELECT
+    CEILING(
+     AVG(Salary * 1.0) - AVG(CAST(REPLACE(CAST(Salary AS VARCHAR), '0', '') AS DECIMAL))
+    )
+FROM
+    Employees
